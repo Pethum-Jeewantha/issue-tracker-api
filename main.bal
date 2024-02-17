@@ -53,6 +53,30 @@ service /api on new http:Listener(PORT) {
         io:println("API is running on ", PORT);
     }
 
+    resource function get issues/summary() returns json|error {
+        sql:ParameterizedQuery query = `SELECT COUNT(*) AS count FROM Issue WHERE status = "OPEN"`;
+        int openCount = check self.db->queryRow(query);
+
+        query = `SELECT COUNT(*) AS count FROM Issue WHERE status = "IN_PROGRESS"`;
+        int inProgressCount = check self.db->queryRow(query);
+
+        query = `SELECT COUNT(*) AS count FROM Issue WHERE status = "DONE"`;
+        int closedCount = check self.db->queryRow(query);
+
+        query = `SELECT * FROM Issue ORDER BY createdAt DESC LIMIT 5`;
+        stream<Issue, sql:Error?> issueStream = self.db->query(query);
+        Issue[] issues = check from Issue issue in issueStream select issue;
+
+        json responseJson = {
+            "open": openCount,
+            "inProgress": inProgressCount,
+            "closed": closedCount,
+            "latestIssues": issues
+        };
+
+        return responseJson;
+    }
+
     resource function get issues(string sortColumn = "id", string sortOrder = "ASC", int pagelimit = 10, int offset = 0, string status = "") returns json|error {
         string orderByClause = string `${sortColumn} ${sortOrder}`;
 
