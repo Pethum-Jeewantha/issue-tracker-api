@@ -77,7 +77,7 @@ service /api on new http:Listener(PORT) {
 
     resource function get issues/[string id]() returns Issue|http:NotFound|error {
         Issue|sql:Error result = self.db->queryRow(`SELECT * FROM Issue WHERE id = ${id}`);
-        
+
         if result is sql:NoRowsError {
             return http:NOT_FOUND;
         } else {
@@ -90,6 +90,26 @@ service /api on new http:Listener(PORT) {
 
         var lastInsertId = insertResult.lastInsertId;
         Issue|sql:Error result = self.db->queryRow(`SELECT * FROM Issue WHERE id = ${lastInsertId}`);
+        if result is sql:NoRowsError {
+            return http:NOT_FOUND;
+        } else {
+            return result;
+        }
+    }
+    
+    resource function put issues/[string id](@http:Payload PostIssue issue) returns Issue|sql:Error|http:NotFound & readonly|error {
+        sql:ParameterizedQuery query = `SELECT COUNT(*) AS count FROM Issue WHERE id = ${id}`;
+        int count = check self.db->queryRow(query);
+        if count == 0 {
+            return http:NOT_FOUND;
+        }
+
+        var updateResult = self.db->execute(`UPDATE Issue SET title = ${issue.title}, description = ${issue.description} WHERE id = ${id}`);
+        if updateResult is sql:Error {
+            return updateResult;
+        }
+
+        Issue|sql:Error result = self.db->queryRow(`SELECT * FROM Issue WHERE id = ${id}`);
         if result is sql:NoRowsError {
             return http:NOT_FOUND;
         } else {
