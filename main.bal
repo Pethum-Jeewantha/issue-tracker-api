@@ -34,7 +34,15 @@ int PORT = 3900;
         allowOrigins: ["http://localhost:5173"],
         allowMethods: ["*"],
         allowHeaders: ["Content-Type", "Authorization"]
-    }
+    },
+    auth: [
+        {
+            jwtValidatorConfig: {
+                issuer: "https://api.asgardeo.io/t/pethumjeewantha/oauth2/token",
+                audience: "3Pk_2oQLDK6OmS11tXD3OlNxKpka"
+            }
+        }
+    ]
 }
 
 service /api on new http:Listener(PORT) {
