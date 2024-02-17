@@ -23,6 +23,15 @@ type Issue record {|
 
 int PORT = 3200;
 
+@http:ServiceConfig {
+    cors: {
+        allowOrigins: ["http://localhost:5173"],
+        allowCredentials: false,
+        allowMethods: ["*"],
+        allowHeaders: ["*"]
+    }
+}
+
 service /api on new http:Listener(PORT) {
     private final mysql:Client db;
 
@@ -71,10 +80,10 @@ service /api on new http:Listener(PORT) {
     //     }
     // }
 
-    // resource function post album(@http:Payload Album album) returns Album|error {
-    //     _ = check self.db->execute(`
-    //         INSERT INTO Albums (id, title, artist, price)
-    //         VALUES (${album.id}, ${album.title}, ${album.artist}, ${album.price});`);
-    //     return album;
-    // }
+    resource function post issue(@http:Payload Issue issue) returns Issue|error {
+        _ = check self.db->execute(`
+            INSERT INTO Issue (title, description)
+            VALUES (${issue.title}, ${issue.description});`);
+        return issue;
+    }
 }
