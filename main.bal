@@ -17,9 +17,14 @@ type Issue record {|
     string description;
     string status;
     string createdAt;
-    string updatedAt;
+    string? updatedAt;
     string? assignedToUserId;
 |};
+
+type PostIssue record {
+    string title;
+    string description;
+};
 
 int PORT = 3200;
 
@@ -80,10 +85,18 @@ service /api on new http:Listener(PORT) {
     //     }
     // }
 
-    resource function post issue(@http:Payload Issue issue) returns Issue|error {
-        _ = check self.db->execute(`
-            INSERT INTO Issue (title, description)
-            VALUES (${issue.title}, ${issue.description});`);
-        return issue;
+    resource function post issues(@http:Payload PostIssue issue) returns Issue|sql:Error|http:NotFound & readonly|error {
+        var insertResult = check self.db->execute(`INSERT INTO Issue (title, description) VALUES (${issue.title}, ${issue.description});`);
+
+        if (insertResult is sql:ExecutionResult) {
+            var lastInsertId = insertResult.lastInsertId;
+
+            Issue|sql:Error result = self.db->queryRow(`SELECT * FROM Issue WHERE id = ${lastInsertId}`);
+            if result is sql:NoRowsError {
+                return http:NOT_FOUND;
+            } else {
+                return result;
+            }
+        }
     }
 }
