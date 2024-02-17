@@ -31,9 +31,8 @@ int PORT = 3200;
 @http:ServiceConfig {
     cors: {
         allowOrigins: ["http://localhost:5173"],
-        allowCredentials: false,
         allowMethods: ["*"],
-        allowHeaders: ["*"]
+        allowHeaders: ["Content-Type", "Authorization"]
     }
 }
 
@@ -76,27 +75,25 @@ service /api on new http:Listener(PORT) {
         return responseJson;
     }
 
-    // resource function get albums/[string id]() returns Album|http:NotFound|error {
-    //     Album|sql:Error result = self.db->queryRow(`SELECT * FROM Albums WHERE id = ${id}`);
-    //     if result is sql:NoRowsError {
-    //         return http:NOT_FOUND;
-    //     } else {
-    //         return result;
-    //     }
-    // }
+    resource function get issues/[string id]() returns Issue|http:NotFound|error {
+        Issue|sql:Error result = self.db->queryRow(`SELECT * FROM Issue WHERE id = ${id}`);
+        
+        if result is sql:NoRowsError {
+            return http:NOT_FOUND;
+        } else {
+            return result;
+        }
+    }
 
     resource function post issues(@http:Payload PostIssue issue) returns Issue|sql:Error|http:NotFound & readonly|error {
         var insertResult = check self.db->execute(`INSERT INTO Issue (title, description) VALUES (${issue.title}, ${issue.description});`);
 
-        if (insertResult is sql:ExecutionResult) {
-            var lastInsertId = insertResult.lastInsertId;
-
-            Issue|sql:Error result = self.db->queryRow(`SELECT * FROM Issue WHERE id = ${lastInsertId}`);
-            if result is sql:NoRowsError {
-                return http:NOT_FOUND;
-            } else {
-                return result;
-            }
+        var lastInsertId = insertResult.lastInsertId;
+        Issue|sql:Error result = self.db->queryRow(`SELECT * FROM Issue WHERE id = ${lastInsertId}`);
+        if result is sql:NoRowsError {
+            return http:NOT_FOUND;
+        } else {
+            return result;
         }
     }
 }
