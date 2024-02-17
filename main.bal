@@ -31,9 +31,35 @@ service /api on new http:Listener(PORT) {
         io:println("API is running on ", PORT);
     }
 
-    resource function get issues() returns Issue[]|error {
-        stream<Issue, sql:Error?> issueStream = self.db->query(`SELECT * FROM Issue`);
-        return from Issue issue in issueStream select issue;
+    resource function get issues(string sortColumn = "id", string sortOrder = "ASC", int pagelimit = 10, int offset = 0, string status = "") returns json|error {
+        string orderByClause = string `${sortColumn} ${sortOrder}`;
+
+        sql:ParameterizedQuery query;
+        if status == "" {
+            query = `SELECT * FROM Issue ORDER BY ${orderByClause} LIMIT ${pagelimit} OFFSET ${offset}`;
+        } else {
+            query = `SELECT * FROM Issue WHERE status = ${status} ORDER BY ${orderByClause} LIMIT ${pagelimit} OFFSET ${offset}`;
+        }
+        
+        stream<Issue, sql:Error?> issueStream = self.db->query(query);
+        Issue[] issues = check from Issue issue in issueStream select issue;
+
+        if status == "" {
+            query = `SELECT COUNT(*) AS count FROM Issue`;
+        } else {
+            query = `SELECT COUNT(*) AS count FROM Issue WHERE status = ${status}`;
+        }
+
+        int countResult = check self.db->queryRow(query);
+
+        json responseJson = {
+            "list": issues,
+            "offset": offset,
+            "limit": pagelimit,
+            "total": countResult
+        };
+
+        return responseJson;
     }
 
     // resource function get albums/[string id]() returns Album|http:NotFound|error {
