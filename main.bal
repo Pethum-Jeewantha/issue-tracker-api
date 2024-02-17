@@ -4,6 +4,7 @@ import ballerina/sql;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
 import ballerina/io;
+import ballerina/time;
 
 configurable string host = "localhost";
 configurable int port = 3306;
@@ -104,7 +105,12 @@ service /api on new http:Listener(PORT) {
             return http:NOT_FOUND;
         }
 
-        var updateResult = self.db->execute(`UPDATE Issue SET title = ${issue.title}, description = ${issue.description} WHERE id = ${id}`);
+        time:Utc currentTime = time:utcNow();
+
+        // Format the time as a string in the SQL DATETIME format
+        // string formattedTime = time:format(currentTime, "yyyy-MM-dd'T'HH:mm:ss");
+
+        var updateResult = self.db->execute(`UPDATE Issue SET title = ${issue.title}, description = ${issue.description}, updatedAt = ${currentTime} WHERE id = ${id}`);
         if updateResult is sql:Error {
             return updateResult;
         }
