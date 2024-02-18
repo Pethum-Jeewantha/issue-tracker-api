@@ -118,7 +118,7 @@ service /api on new http:Listener(PORT) {
         }
     }
 
-    resource function post issues(@http:Payload PostIssue issue) returns Issue|sql:Error|http:NotFound & readonly|error {
+    resource function post issues(@http:Payload PostIssue issue) returns Issue|sql:Error|http:NotFound|error {
         var insertResult = check self.db->execute(`INSERT INTO Issue (title, description) VALUES (${issue.title}, ${issue.description});`);
 
         var lastInsertId = insertResult.lastInsertId;
@@ -130,7 +130,7 @@ service /api on new http:Listener(PORT) {
         }
     }
     
-    resource function put issues/[string id](@http:Payload PostIssue issue) returns Issue|sql:Error|http:NotFound & readonly|error {
+    resource function put issues/[string id](@http:Payload PostIssue issue) returns Issue|sql:Error|http:NotFound|error {
         sql:ParameterizedQuery query = `SELECT COUNT(*) AS count FROM Issue WHERE id = ${id}`;
         int count = check self.db->queryRow(query);
         if count == 0 {
