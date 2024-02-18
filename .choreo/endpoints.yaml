@@ -1,0 +1,7 @@
+version: 1.0
+endpoints:
+- name: Issue Tracker API
+  port: 3900
+  type: REST
+  networkVisibility: Public
+  context: /
