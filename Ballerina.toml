@@ -6,3 +6,10 @@ distribution = "2201.8.4"
 
 [build-options]
 observabilityIncluded = true
+
+[configurable]
+dbHost = {type = "string", value = "localhost"}
+dbPort = {type = "int", value = 3306}
+dbName = {type = "string", value = "testdb"}
+dbUser = {type = "string", value = "testuser"}
+dbPassword = {type = "string", value = "testpass"}

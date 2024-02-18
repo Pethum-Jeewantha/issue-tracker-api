@@ -6,11 +6,11 @@ import ballerinax/mysql.driver as _;
 import ballerina/io;
 import ballerina/time;
 
-configurable string host = "localhost";
-configurable int port = 3306;
-configurable string user = "root";
-configurable string password = "mysql";
-configurable string database = "issue-tracker";
+configurable string dbHost = "localhost";
+configurable int dbPort = 3306;
+configurable string dbUser = "root";
+configurable string dbPassword = "mysql";
+configurable string dbName = "issue-tracker";
 
 type Issue record {|
     int id;
@@ -49,7 +49,7 @@ service /api on new http:Listener(PORT) {
     private final mysql:Client db;
 
     function init() returns error? {
-        self.db = check new (host, user, password, database, port);
+        self.db = check new (dbHost, dbUser, dbPassword, dbName, dbPort);
         io:println("API is running on ", PORT);
     }
 
