@@ -32,7 +32,7 @@ int PORT = 3900;
 
 @http:ServiceConfig {
     cors: {
-        allowOrigins: ["http://localhost:5173", "https://399f54c4-1326-49cf-b555-612ec896e7e6.e1-us-east-azure.choreoapps.dev"],
+        allowOrigins: ["http://localhost:5173", "https://6166c516-dcf1-4b12-93b6-07fe52b06599.e1-us-east-azure.choreoapps.dev"],
         allowMethods: ["*"],
         allowHeaders: ["Content-Type", "Authorization"]
     },
