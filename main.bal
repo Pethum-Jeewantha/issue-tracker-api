@@ -37,15 +37,15 @@ int PORT = 3900;
         allowOrigins: ["http://localhost:5173", "https://6166c516-dcf1-4b12-93b6-07fe52b06599.e1-us-east-azure.choreoapps.dev"],
         allowMethods: ["*"],
         allowHeaders: ["Content-Type", "Authorization"]
-    },
-    auth: [
-        {
-            jwtValidatorConfig: {
-                issuer: asgardeoIssuer,
-                audience: asgardeoAud
-            }
-        }
-    ]
+    }
+    // auth: [
+    //     {
+    //         jwtValidatorConfig: {
+    //             issuer: asgardeoIssuer,
+    //             audience: asgardeoAud
+    //         }
+    //     }
+    // ]
 }
 
 service /api on new http:Listener(PORT) {
@@ -54,6 +54,13 @@ service /api on new http:Listener(PORT) {
     function init() returns error? {
         self.db = check new (dbHost, dbUser, dbPassword, dbName, dbPort);
         io:println("API is running on ", PORT);
+    }
+
+    resource function get healthz() returns json {
+        json responseJson = {
+            "status": "UP & RUNNING"
+        };
+        return responseJson;
     }
 
     resource function get issues/summary() returns json|error {
