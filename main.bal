@@ -11,6 +11,8 @@ configurable int dbPort = 3306;
 configurable string dbUser = "root";
 configurable string dbPassword = "mysql";
 configurable string dbName = "issue-tracker";
+
+configurable string asgardeoIssuer = "https://api.asgardeo.io/t/pethumjeewantha/oauth2/token";
 configurable string asgardeoAud = "3Pk_2oQLDK6OmS11tXD3OlNxKpka";
 
 type Issue record {|
@@ -39,7 +41,7 @@ int PORT = 3900;
     auth: [
         {
             jwtValidatorConfig: {
-                issuer: "https://api.asgardeo.io/t/pethumjeewantha/oauth2/token",
+                issuer: asgardeoIssuer,
                 audience: asgardeoAud
             }
         }
