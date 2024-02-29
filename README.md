@@ -46,10 +46,10 @@ This app enhances issue tracking by integrating MySQL for storage and the GPT AP
 5. Run the development server:
 
 ```bash
-npm run dev
+bal run
 ```
 
-Open [http://localhost:5173](http://localhost:5173) with your browser to see the result.
+The server will run on [http://localhost:3900](http://localhost:3900)
 
 ## Usage
 
