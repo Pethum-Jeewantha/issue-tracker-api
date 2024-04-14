@@ -13,4 +13,3 @@ dbPort = {type = "int", value = 3306}
 dbName = {type = "string", value = "testdb"}
 dbUser = {type = "string", value = "testuser"}
 dbPassword = {type = "string", value = "testpass"}
-asgardeoAud = {type = "string", value = "testclient"}
