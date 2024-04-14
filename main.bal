@@ -12,9 +12,6 @@ configurable string dbUser = "root";
 configurable string dbPassword = "mysql";
 configurable string dbName = "issue-tracker";
 
-configurable string asgardeoIssuer = "https://api.asgardeo.io/t/pethumjeewantha/oauth2/token";
-configurable string asgardeoAud = "3Pk_2oQLDK6OmS11tXD3OlNxKpka";
-
 type Issue record {|
     int id;
     string title;
@@ -23,6 +20,12 @@ type Issue record {|
     string createdAt;
     string? updatedAt;
     string? assignedToUserId;
+|};
+
+type Application record {|
+    int id;
+    string name;
+    string value;
 |};
 
 type PostIssue record {
@@ -38,14 +41,6 @@ int PORT = 3900;
         allowMethods: ["*"],
         allowHeaders: ["Content-Type", "Authorization"]
     }
-    // auth: [
-    //     {
-    //         jwtValidatorConfig: {
-    //             issuer: asgardeoIssuer,
-    //             audience: asgardeoAud
-    //         }
-    //     }
-    // ]
 }
 
 service /api on new http:Listener(PORT) {
@@ -61,6 +56,14 @@ service /api on new http:Listener(PORT) {
             "status": "UP & RUNNING"
         };
         return responseJson;
+    }
+
+    resource function get application() returns json|error {
+        sql:ParameterizedQuery query = `SELECT * FROM Application`;
+        stream<Application, sql:Error?> applicationStream = self.db->query(query);
+        Application[] applicationData = check from Application application in applicationStream select application;
+
+        return applicationData;
     }
 
     resource function get issues/summary() returns json|error {
