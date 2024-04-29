@@ -67,13 +67,13 @@ service /api on new http:Listener(PORT) {
     }
 
     resource function get issues/summary() returns json|error {
-        sql:ParameterizedQuery query = `SELECT COUNT(*) AS count FROM Issue WHERE status = "OPEN"`;
+        sql:ParameterizedQuery query = `SELECT COUNT(*) AS count FROM Issue WHERE status = 'OPEN'`;
         int openCount = check self.db->queryRow(query);
 
-        query = `SELECT COUNT(*) AS count FROM Issue WHERE status = "IN_PROGRESS"`;
+        query = `SELECT COUNT(*) AS count FROM Issue WHERE status = 'IN_PROGRESS'`;
         int inProgressCount = check self.db->queryRow(query);
 
-        query = `SELECT COUNT(*) AS count FROM Issue WHERE status = "DONE"`;
+        query = `SELECT COUNT(*) AS count FROM Issue WHERE status = 'DONE'`;
         int closedCount = check self.db->queryRow(query);
 
         query = `SELECT * FROM Issue ORDER BY createdAt DESC LIMIT 5`;
